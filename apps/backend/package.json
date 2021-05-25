@@ -1,0 +1,9 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "An ExpressJS backend to power our React frontend",
+  "main": "index.js",
+  "author": "Antony M",
+  "license": "MIT",
+  "private": true
+}
