@@ -1,13 +1,30 @@
-.idea/
-.vscode/
+# dependencies
+node_modules
 node_modules/
 build/
 tmp/
 temp/
 
-.env
+# testing
+coverage
+.eslintcache
 
+# production
+build
+
+# misc
+.DS_Store
+.idea/
+.vscode/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# log files
 logs
 *.logs
 logs/
 logs/*.logs
+.log*
