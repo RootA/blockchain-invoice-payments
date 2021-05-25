@@ -6,11 +6,11 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy:backend": "git push heroku `git subtree split --prefix src/backend master`:master",
-    "deploy:frontend": "cd src/frontend && yarn build && gh-pages -d build",
+    "deploy:backend": "git push heroku `git subtree split --prefix apps/backend master`:master",
+    "deploy:frontend": "cd apps/frontend && yarn build && gh-pages -d build",
     "lint": "tsc --noEmit && eslint . --ext js,ts,tsx",
-    "start:backend": "cd src/backend && yarn start",
-    "start:frontend": "cd src/frontend && yarn start",
+    "start:backend": "cd apps/backend && yarn start",
+    "start:frontend": "cd apps/frontend && yarn start",
     "start": "run-p -l start:*"
   },
   "devDependencies": {
