@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+	  "experimentalDecorators": true,
+      "allowSyntheticDefaultImports": true,
+      "emitDecoratorMetadata": true,
+      "esModuleInterop": true,
+      "outDir": "build",
+      "module": "commonjs",
+      "strict": true,
+      "target": "es2017"
+    },
+    "include": ["src/"]
+  }
