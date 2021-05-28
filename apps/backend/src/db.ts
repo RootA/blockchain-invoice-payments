@@ -4,6 +4,7 @@ import { config } from './config';
 module.exports = function () {
 	mongoose.set('useCreateIndex', true);
 	mongoose.set('useFindAndModify', false);
+
 	const dbUrl = config.DB_CONNECTION_URL;
 
 	mongoose
