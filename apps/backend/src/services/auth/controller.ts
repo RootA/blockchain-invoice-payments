@@ -1,7 +1,7 @@
 import { recoverPersonalSignature } from 'eth-sig-util';
 import { bufferToHex } from 'ethereumjs-util';
 import { NextFunction, Request, Response } from 'express';
-import { getMongoRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 
 import jwt from 'jsonwebtoken';
 
@@ -11,7 +11,7 @@ import { UserEntity } from '../../entity/user.entity';
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const create = (req: Request, res: Response, next: NextFunction) => {
 	const { signature, publicAddress } = req.body;
-	const userRepository = getMongoRepository(UserEntity);
+	const userRepository = getRepository(UserEntity);
 	if (!signature || !publicAddress)
 		return res
 			.status(400)
