@@ -24,7 +24,9 @@ export const get = (req: Request, res: Response, next: NextFunction) => {
 	// AccessToken payload is in req.user.payload, especially its `id` field
 	// UserId is the param in /users/:userId
 	// We only allow user accessing herself, i.e. require payload.id==userId
-	if ((req as any).user.payload.id !== +req.params.userId) {
+	console.log('WE are here');
+	console.log(req.user, req.params.userId);
+	if ((req as any).user.payload.id !== req.params.userId) {
 		return res
 			.status(401)
 			.send({ error: 'You can can only access yourself' });
@@ -50,9 +52,10 @@ export const create = (req: Request, res: Response, next: NextFunction) => {
 	console.log('sdsd =>', req.body);
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const patch = (req: Request, res: Response, next: NextFunction) => {
 	// Only allow to fetch current user
-	if ((req as any).user.payload.id !== +req.params.userId) {
+	if ((req as any).user.payload.id !== req.params.userId) {
 		return res
 			.status(401)
 			.send({ error: 'You can can only access yourself' });
