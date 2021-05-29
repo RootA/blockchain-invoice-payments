@@ -10,7 +10,11 @@
     "build": "tsc",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'yarn start'",
     "heroku": "node ./build",
-    "start": "ts-node src"
+    "start": "ts-node src",
+    "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
+    "seed:run": "ts-node ./node_modules/typeorm/cli.js migration:run",
+    "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop",
+    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync"
   },
   "dependencies": {
     "@types/bluebird": "^3.5.35",
@@ -33,9 +37,11 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.9",
     "mongoose": "^5.12.11",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "typeorm-seeding": "^1.6.1"
   },
   "devDependencies": {
+    "@types/faker": "^5.5.5",
     "@types/node": "^15.6.1",
     "nodemon": "^2.0.7",
     "ts-node": "^10.0.0",
