@@ -3,21 +3,13 @@ import './Home.css';
 import jwtDecode from 'jwt-decode';
 import React, { useState, useEffect } from 'react';
 import Blockies from 'react-blockies';
+import Web3 from 'web3';
 
 import { Auth } from '../types';
 
 interface Props {
 	auth: Auth;
 	onLoggedOut: () => void;
-}
-
-interface State {
-	loading: boolean;
-	user?: {
-		id: number;
-		username: string;
-	};
-	username: string;
 }
 
 interface JwtDecoded {
@@ -27,63 +19,31 @@ interface JwtDecoded {
 	};
 }
 
+interface InvoiceI {
+	id: string;
+	amount: number;
+	invoiceNumber: number;
+	coin: string;
+	invoiceTo: string;
+	invoiceFrom: string;
+	status: string;
+}
+
 export const Home = ({ auth, onLoggedOut }: Props): JSX.Element => {
-	const [state, setState] = useState<State>({
-		loading: false,
-		user: undefined,
-		username: '',
-	});
+	const [invoices, setInvoices] = useState([]);
 
 	useEffect(() => {
 		const { accessToken } = auth;
-		const {
-			payload: { id },
-		} = jwtDecode<JwtDecoded>(accessToken);
 
-		fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${id}`, {
+		fetch(`${process.env.REACT_APP_BACKEND_URL}/invoices`, {
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 			},
 		})
 			.then((response) => response.json())
-			.then((user) => setState({ ...state, user }))
+			.then((invoices: []) => setInvoices(invoices))
 			.catch(window.alert);
 	}, []);
-
-	const handleChange = ({
-		target: { value },
-	}: React.ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, username: value });
-	};
-
-	const handleSubmit = () => {
-		const { accessToken } = auth;
-		const { user, username } = state;
-
-		setState({ ...state, loading: true });
-
-		if (!user) {
-			window.alert(
-				'The user id has not been fetched yet. Please try again in 5 seconds.'
-			);
-			return;
-		}
-
-		fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${user.id}`, {
-			body: JSON.stringify({ username }),
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-				'Content-Type': 'application/json',
-			},
-			method: 'PATCH',
-		})
-			.then((response) => response.json())
-			.then((user) => setState({ ...state, loading: false, user }))
-			.catch((err) => {
-				window.alert(err);
-				setState({ ...state, loading: false });
-			});
-	};
 
 	const { accessToken } = auth;
 
@@ -91,29 +51,72 @@ export const Home = ({ auth, onLoggedOut }: Props): JSX.Element => {
 		payload: { publicAddress },
 	} = jwtDecode<JwtDecoded>(accessToken);
 
-	const { loading, user } = state;
-
-	const username = user && user.username;
+	const makeInvoicePayment = async (invoice: { invoice: InvoiceI; }) => {
+		const invoiceTxn = invoice.invoice;
+		const web3 = new Web3((window as any).ethereum);
+		console.log(web3.eth.accounts.wallet);
+		const addresses = await web3.eth.getAccounts();
+		console.log("addresses =>", addresses);
+		web3.eth.sendTransaction({
+			from: addresses[0],
+			to: invoiceTxn.invoiceTo.toLowerCase(),
+			value: invoiceTxn.amount.toString()
+		}).once('sending', payload => {
+			console.log('sending payload', payload);
+		}).once('sent', payload => {
+			console.log('sent payload', payload);
+		}).once('transactionHash', hash => {
+			console.log('sending hash', hash);
+		}).once('receipt', receipt => {
+			console.log('receipt', receipt);
+		}).on('confirmation', (confNumber, receipt, latestBlockHash) => {
+			console.log('confNumber =>', confNumber);
+			console.log('receipt =>', receipt);
+			console.log('latestBlockHash =>', latestBlockHash);
+		}).on('error', error => {
+			console.log('error => ', error);
+		}).then((receipt) => {
+			console.log('After miniing response => ', receipt);
+		});
+	};
 
 	return (
 		<div className="Profile">
 			<p>
 				Logged in as <Blockies seed={publicAddress} />
 			</p>
-			<div>
-				My username is {username ? <pre>{username}</pre> : 'not set.'}{' '}
-				My publicAddress is <pre>{publicAddress}</pre>
-			</div>
-			<div>
-				<label htmlFor="username">Change username: </label>
-				<input name="username" onChange={handleChange} />
-				<button disabled={loading} onClick={handleSubmit}>
-					Submit
-				</button>
-			</div>
 			<p>
 				<button onClick={onLoggedOut}>Logout</button>
 			</p>
+
+			<table className="table" id="invoices">
+				<thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Invoice Number</th>
+						<th scope="col">Invoice Amount</th>
+						<th scope="col">Invoice Status</th>
+						<th scope="col">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+				{invoices.map(( invoice: InvoiceI, index: React.Key | null | undefined ) => {
+					return (
+						<tr key={index}>
+							<td>{index}</td>
+							<td>{invoice.invoiceNumber}</td>
+							<td>{invoice.coin} {invoice.amount}</td>
+							<td>{invoice.status}</td>
+							<td>
+								{(invoice.status.toLowerCase() === 'paid') ? 'paid' : <button onClick={() => makeInvoicePayment({invoice})}>Pay</button>}
+								
+							</td>
+						</tr>
+					);
+				})}
+				</tbody>
+			</table>
+			
 		</div>
 	);
 };

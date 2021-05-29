@@ -9,6 +9,8 @@ import helmet from 'helmet';
 
 import { services } from './services';
 import { UserEntity } from './entity/user.entity';
+import { InvoiceEntity } from './entity/invoice.entity';
+import { TransactionEntity } from './entity/transaction.entity';
 
 dotenv.config();
 createConnection({
@@ -16,13 +18,14 @@ createConnection({
 	url: process.env.DB_CONNECTION_URL || 'mongodb://localhost:27017/defi',
 	useUnifiedTopology: true,
 	logging: true,
-	entities: [UserEntity],
+	entities: [UserEntity, InvoiceEntity, TransactionEntity],
 })
 	// eslint-disable-next-line @typescript-eslint/require-await
 	.then(async (connection) => {
 		if (connection.isConnected) {
 			console.log('Database connection successful');
 			console.log('DB_URL =>', process.env.DB_CONNECTION_URL);
+			connection.runMigrations();
 		}
 
 		// create express app
