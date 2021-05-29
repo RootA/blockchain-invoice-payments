@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy:backend": "git push heroku `git subtree split --prefix apps/backend master`:master",
+    "deploy:backend": "git push heroku `git subtree split --prefix apps/backend main`:main",
     "deploy:frontend": "cd apps/frontend && yarn build && gh-pages -d build",
     "lint": "tsc --noEmit && eslint . --ext js,ts,tsx",
     "start:backend": "cd apps/backend && yarn start",
