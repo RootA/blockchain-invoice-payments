@@ -143,7 +143,7 @@ export const Home = ({ auth, onLoggedOut }: Props): JSX.Element => {
 							<td>{invoice.coin} {invoice.amount}</td>
 							<td>{invoice.status}</td>
 							<td>
-								{(invoice.status.toLowerCase() === 'paid') ? 'paid' : <button onClick={() => makeInvoicePayment({invoice})}>Pay</button>}
+								{(invoice.status.toLowerCase() === 'paid') ? 'successful' : <button onClick={() => makeInvoicePayment({invoice})}>Pay</button>}
 								
 							</td>
 						</tr>
