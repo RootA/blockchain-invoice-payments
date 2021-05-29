@@ -40,9 +40,9 @@ export const Home = ({ auth, onLoggedOut }: Props): JSX.Element => {
 				Authorization: `Bearer ${accessToken}`,
 			},
 		})
-			.then((response) => response.json())
-			.then((invoices: []) => setInvoices(invoices))
-			.catch(window.alert);
+		.then((response) => response.json())
+		.then((invoices: []) => setInvoices(invoices))
+		.catch(window.alert);
 	}, []);
 
 	const { accessToken } = auth;
@@ -54,9 +54,7 @@ export const Home = ({ auth, onLoggedOut }: Props): JSX.Element => {
 	const makeInvoicePayment = async (invoice: { invoice: InvoiceI; }) => {
 		const invoiceTxn = invoice.invoice;
 		const web3 = new Web3((window as any).ethereum);
-		console.log(web3.eth.accounts.wallet);
 		const addresses = await web3.eth.getAccounts();
-		console.log("addresses =>", addresses);
 		web3.eth.sendTransaction({
 			from: addresses[0],
 			to: invoiceTxn.invoiceTo.toLowerCase(),
@@ -68,15 +66,52 @@ export const Home = ({ auth, onLoggedOut }: Props): JSX.Element => {
 		}).once('transactionHash', hash => {
 			console.log('sending hash', hash);
 		}).once('receipt', receipt => {
-			console.log('receipt', receipt);
+			let data = {
+				status: ''
+			};
+			if (receipt.status === true) {
+				data.status = 'Paid'
+			} else {
+				data.status = 'Failed'
+			}
+			fetch(`${process.env.REACT_APP_BACKEND_URL}/invoices/${invoiceTxn.id}`, {
+				body: JSON.stringify(data),
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					"Content-Type": "application/json"
+				},
+				method: 'POST'
+			})
+			.then((response) => response.json())
+			.then((data) => {
+				setInvoices(data.data);
+				window.location.reload();
+			})
+			.catch(window.alert);
 		}).on('confirmation', (confNumber, receipt, latestBlockHash) => {
-			console.log('confNumber =>', confNumber);
-			console.log('receipt =>', receipt);
-			console.log('latestBlockHash =>', latestBlockHash);
+			fetch(`${process.env.REACT_APP_BACKEND_URL}/transactions/new`, {
+				body: JSON.stringify(receipt),
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					"Content-Type": "application/json"
+				},
+				method: 'POST',
+			})
+			.then((response) => response.json())
+			.catch(window.alert);
 		}).on('error', error => {
 			console.log('error => ', error);
 		}).then((receipt) => {
-			console.log('After miniing response => ', receipt);
+			fetch(`${process.env.REACT_APP_BACKEND_URL}/transactions/new`, {
+				body: JSON.stringify(receipt),
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					"Content-Type": "application/json"
+				},
+				method: 'POST',
+			})
+			.then((response) => response.json())
+			.catch(window.alert);
 		});
 	};
 

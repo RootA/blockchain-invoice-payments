@@ -8,4 +8,4 @@ export const invoiceRouter = express.Router();
 /** GET /api/invoices */
 invoiceRouter.route('/').get(jwt(config), controller.get);
 
-invoiceRouter.route('/:invoiceId').patch(jwt(config), controller.patch);
+invoiceRouter.route('/:invoiceId').post(jwt(config), controller.patch);

@@ -21,7 +21,7 @@ export const patch = async (
 ) => {
 	const invoiceRepository = getRepository(InvoiceEntity);
 	const invoice = await invoiceRepository.findOne(req.params.invoiceId);
-	const state = req.body.state;
+	const state = req.body.status;
 
 	if (invoice) {
 		if (state.toLowerCase() === State.Transacting.toLowerCase()) {
@@ -34,11 +34,14 @@ export const patch = async (
 			invoice.status = State.Failed;
 		}
 		invoiceRepository.save(invoice);
-		res.status(200).json({
+		const invoices = await invoiceRepository.find();
+		return res.status(200).json({
 			message: 'Successfully updated',
+			data: invoices,
+		});
+	} else {
+		return res.status(404).json({
+			message: 'Cannot find the invoice',
 		});
 	}
-	res.status(404).json({
-		message: 'Cannot find the invoice',
-	});
 };
